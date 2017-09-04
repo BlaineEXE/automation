@@ -37,4 +37,12 @@ feature "Register user and configure cluster" do
     end
   end
 
+  scenario "User proceeds past AutoYaST page" do
+    with_screenshot(name: :skip_autoyast) do
+      puts ">>> Skipping past the AutoYaST page"
+      visit "/setup/worker-bootstrap"
+      click_on "Next"
+      puts "<<< Skipped past the AutoYaST page"
+    end
+  end
 end
