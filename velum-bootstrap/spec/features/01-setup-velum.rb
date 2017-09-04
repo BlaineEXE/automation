@@ -17,13 +17,23 @@ feature "Register user and configure cluster" do
 
   scenario "User registers" do
     with_screenshot(name: :register) do
-      register
+      puts ">>> Registering user"
+      visit "/users/sign_up"
+      fill_in "user_email", with: "test@test.com"
+      fill_in "user_password", with: "password"
+      fill_in "user_password_confirmation", with: "password"
+      click_on "Create Admin"
+      puts "<<< User registered"
     end
   end
 
   scenario "User configures the cluster" do
     with_screenshot(name: :configure) do
-      configure
+      puts ">>> Setting up velum"
+      visit "/setup"
+      fill_in "settings_dashboard", with: environment["dashboardHost"] || default_ip_address
+      click_on "Next"
+      puts "<<< Velum set up"
     end
   end
 
