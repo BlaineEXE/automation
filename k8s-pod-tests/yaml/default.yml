@@ -1,0 +1,47 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: default
+spec:
+  template:
+    metadata:
+      labels:
+        app: default
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        volumeMounts:
+        - mountPath: /srv/www
+          name: www-data
+          readOnly: true
+        ports:
+        - containerPort: 80
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+            httpHeaders:
+              - name: X-Custom-Header
+                value: Awesome
+          initialDelaySeconds: 3
+
+      - name: redis
+        image: redis
+      - name: mariadb
+        image: mariadb
+        env:
+          - name: MYSQL_ROOT_PASSWORD
+            value: foo
+        readinessProbe:
+          tcpSocket:
+            port: 3306
+          initialDelaySeconds: 130
+        livenessProbe:
+          tcpSocket:
+            port: 3306
+          initialDelaySeconds: 130
+
+      volumes:
+      - name: www-data
+        emptyDir: {}

@@ -1,0 +1,98 @@
+#!/bin/sh
+
+set -euo pipefail
+
+# options
+ACTION=""
+
+USAGE=$(cat <<USAGE
+Usage:
+
+  * List pods
+
+    -l|--list                                List running pods
+
+  * Creating a pod
+
+    -c|--create          <MANIFEST_FNAME>    Create a pod using a manifest file
+
+  * Scaling up a pod
+
+    -s|--scale           <NAME> <NUM>        Set the number of replicas
+
+  * Examples:
+
+  $0 -l
+  $0 --create default
+
+Requirements:
+ - 'kubeconfig' file in the current directory
+ - 'kubectl' executable in path
+ 
+USAGE
+)
+
+# Utility methods
+log()        { (>&2 echo ">>> [caasp-stack] $@") ; }
+warn()       { log "WARNING: $@" ; }
+error()      { log "ERROR: $@" ; exit 1 ; }
+check_file() { if [ ! -f $1 ]; then error "File $1 doesn't exist!"; fi }
+
+# parse options
+while [[ $# > 0 ]] ; do
+  case $1 in
+    -l|--list)
+      ACTION="list"
+      ;;
+    -c|--create)
+      ACTION="create"
+      MANIFEST_FNAME="$2"
+      shift
+      ;;
+    -s|--scale)
+      ACTION="scale"
+      NAME="$2"
+      NUM_REPLICAS="$3"
+      shift
+      ;;
+    -h|--help)
+      echo "$USAGE"
+      exit 0
+      ;;
+  esac
+  shift
+done
+
+# Core methods
+
+list_pods() {
+  kubectl get pods --kubeconfig=kubeconfig
+}
+
+create_pod() {
+  kubectl apply -f $MANIFEST_FNAME --kubeconfig=kubeconfig
+}
+
+scale_pod() {
+ kubectl scale --replicas=$NUM_REPLICAS --kubeconfig=kubeconfig deployment/$NAME
+}
+
+# main
+
+case "$ACTION" in
+  list)
+    list_pods
+    ;;
+  create)
+    create_pod
+    ;;
+  scale)
+    scale_pod
+    ;;
+  *)
+    echo "$USAGE"
+    exit 1
+    ;;
+esac
+
+log "Done"
