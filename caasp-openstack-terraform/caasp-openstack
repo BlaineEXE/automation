@@ -62,12 +62,6 @@ else
   abort "$USAGE"
 fi
 
-[ -d ssh ] || mkdir ssh
-
-if ! [ -f ssh/id_caasp ]; then
-  ssh-keygen -b 2048 -t rsa -f ssh/id_caasp -N ""
-fi
-
 if [ -v $OS_AUTH_URL ] || [ -v $OS_USERNAME ] ; then
   abort "$USAGE"
 fi
