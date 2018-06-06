@@ -1,9 +1,3 @@
-variable "auth_url" {}
-variable "domain_name" {}
-variable "region_name" {}
-variable "project_name" {}
-variable "user_name" {}
-variable "password" {}
 variable "image_name" {}
 variable "internal_net" {}
 variable "external_net" {}
@@ -17,12 +11,7 @@ variable "dnsentry" {}
 variable "identifier" {}
 
 provider "openstack" {
-  domain_name = "${var.domain_name}"
-  tenant_name = "${var.project_name}"
-  user_name   = "${var.user_name}"
-  password    = "${var.password}"
-  auth_url    = "${var.auth_url}"
-  insecure    = "true"
+  insecure = "true"
 }
 
 resource "openstack_dns_zone_v2" "caasp" {
@@ -66,13 +55,11 @@ data "template_file" "cloud-init" {
 
 resource "openstack_compute_keypair_v2" "keypair" {
   name       = "caasp-ssh-${var.identifier}"
-  region     = "${var.region_name}"
   public_key = "${file("ssh/id_caasp.pub")}"
 }
 
 resource "openstack_compute_instance_v2" "admin" {
   name       = "caasp-admin"
-  region     = "${var.region_name}"
   image_name = "${var.image_name}"
 
   connection {
@@ -106,7 +93,6 @@ resource "openstack_compute_floatingip_associate_v2" "admin_ext_ip" {
 resource "openstack_compute_instance_v2" "master" {
   count      = "${var.masters}"
   name       = "caasp-master${count.index}"
-  region     = "${var.region_name}"
   image_name = "${var.image_name}"
 
   connection {
@@ -142,7 +128,6 @@ resource "openstack_compute_floatingip_associate_v2" "master_ext_ip" {
 resource "openstack_compute_instance_v2" "worker" {
   count      = "${var.workers}"
   name       = "caasp-worker${count.index}"
-  region     = "${var.region_name}"
   image_name = "${var.image_name}"
 
   connection {

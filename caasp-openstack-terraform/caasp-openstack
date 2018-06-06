@@ -11,7 +11,7 @@ USAGE:
 
   1. Use openrc.sh OpenStack file and
 
-     # source openrc.sh 
+     # source openrc.sh
 
     or manually export following variables
 
@@ -41,10 +41,10 @@ USAGE:
   # caasp-openstack apply - deploy CaaSP application
   # caasp-openstack refresh - refresh CaaSP resources
   # caasp-openstack plan - plan CaaSP update
-  # caasp-openstack destroy - cleanup CaaSP installation  
+  # caasp-openstack destroy - cleanup CaaSP installation
   # caasp-openstack output - show CaaSP ip addresses
   # caasp-openstack show - show CaaSP deployment
-  
+
 <<<
 USAGE
 )
@@ -58,7 +58,7 @@ if [ $# -eq 1 ]; then
       abort "$USAGE"
       ;;
   esac
-else 
+else
   abort "$USAGE"
 fi
 
@@ -68,9 +68,7 @@ if ! [ -f ssh/id_caasp ]; then
   ssh-keygen -b 2048 -t rsa -f ssh/id_caasp -N ""
 fi
 
-if [ -v $OS_AUTH_URL ] || [ -v $OS_PROJECT_NAME ] || \
-    [ -v $OS_USER_DOMAIN_NAME ] ||  [ -v $OS_USERNAME ] || \
-    [ -v $OS_REGION_NAME ]; then
+if [ -v $OS_AUTH_URL ] || [ -v $OS_USERNAME ] ; then
   abort "$USAGE"
 fi
 
@@ -84,6 +82,4 @@ if [ -v $OS_PASSWORD ]; then
   export OS_PASSWORD=$OS_PASSWORD_INPUT
 fi
 
-terraform $COMMAND -var auth_url=$OS_AUTH_URL -var domain_name=$OS_USER_DOMAIN_NAME \
-                    -var region_name=$OS_REGION_NAME -var project_name=$OS_PROJECT_NAME \
-                    -var user_name=$OS_USERNAME -var password=$OS_PASSWORD -var-file=openstack.tfvars
+terraform $COMMAND -var-file=openstack.tfvars
