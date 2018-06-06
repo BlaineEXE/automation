@@ -7,8 +7,18 @@ variable "masters" {}
 variable "worker_size" {}
 variable "workers" {}
 variable "dnsdomain" {}
-variable "dnsentry" {}
+variable "dnsentry" {
+  description = "Truthy values reate DNS entries. Falsy values do not create DNS entries."
+}
 variable "identifier" {}
+variable "additional_volume_count" {
+  description = "Number of additional storage volumes to add to each node"
+  default = 0
+}
+variable "additional_volume_size" {
+  description = "Size of additional volumes in Gigabytes"
+  default     = 10
+}
 
 provider "openstack" {
   insecure = "true"
@@ -149,6 +159,19 @@ resource "openstack_compute_instance_v2" "worker" {
   user_data = "${data.template_file.cloud-init.rendered}"
 }
 
+resource "openstack_blockstorage_volume_v2" "worker-volumes" {
+    depends_on = ["openstack_compute_instance_v2.worker"]
+    name       = "${var.cluster_name}-worker-volume-${ count.index / var.additional_volume_count }-${ count.index % var.additional_volume_count }"
+    count      = "${ var.workers * var.additional_volume_count }"
+    size       = "${var.additional_volume_size}"
+}
+
+resource "openstack_compute_volume_attach_v2" "worker-volume-attachments" {
+    count       = "${ var.workers * var.additional_volume_count }"
+    instance_id = "${element(openstack_compute_instance_v2.worker.*.id, count.index / var.additional_volume_count )}"
+    volume_id   = "${element(openstack_blockstorage_volume_v2.worker-volumes.*.id, count.index)}"
+}
+
 resource "openstack_networking_floatingip_v2" "worker_ext" {
   count = "${var.workers}"
   pool  = "${var.external_net}"
@@ -158,6 +181,19 @@ resource "openstack_compute_floatingip_associate_v2" "worker_ext_ip" {
   count       = "${var.workers}"
   floating_ip = "${element(openstack_networking_floatingip_v2.worker_ext.*.address, count.index)}"
   instance_id = "${element(openstack_compute_instance_v2.worker.*.id, count.index)}"
+}
+
+resource "openstack_blockstorage_volume_v2" "worker-volumes" {
+  name       = "${var.cluster_name}-worker-volume-${ count.index / var.additional_volume_count }-${ count.index % var.additional_volume_count }"
+  count      = "${ var.workers * var.additional_volume_count }"
+  size       = "${var.additional_volume_size}"
+}
+
+resource "openstack_compute_volume_attach_v2" "worker-volume-attachments" {
+  depends_on = ["openstack_compute_instance_v2.worker"]
+  count       = "${ var.workers * var.additional_volume_count }"
+  instance_id = "${element(openstack_compute_instance_v2.worker.*.id, count.index / var.additional_volume_count )}"
+  volume_id   = "${element(openstack_blockstorage_volume_v2.worker-volumes.*.id, count.index)}"
 }
 
 output "ip_admin_external" {
