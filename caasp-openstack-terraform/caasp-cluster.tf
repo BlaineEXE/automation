@@ -10,7 +10,10 @@ variable "dnsdomain" {}
 variable "dnsentry" {
   description = "Truthy values reate DNS entries. Falsy values do not create DNS entries."
 }
-variable "identifier" {}
+variable "identifier" {
+  description = "Name to prefix resources to prevent user collisions in shared environments."
+  default     = "test"
+}
 variable "additional_volume_count" {
   description = "Number of additional storage volumes to add to each node"
   default = 0
@@ -64,12 +67,12 @@ data "template_file" "cloud-init" {
 }
 
 resource "openstack_compute_keypair_v2" "keypair" {
-  name       = "caasp-ssh-${var.identifier}"
+  name       = "${var.identifier}-caasp-ssh"
   public_key = "${file("../misc-files/id_shared.pub")}"
 }
 
 resource "openstack_compute_instance_v2" "admin" {
-  name       = "caasp-admin"
+  name       = "${var.identfier}-caasp-admin"
   image_name = "${var.image_name}"
 
   connection {
@@ -77,7 +80,7 @@ resource "openstack_compute_instance_v2" "admin" {
   }
 
   flavor_name = "${var.admin_size}"
-  key_pair    = "caasp-ssh-${var.identifier}"
+  key_pair    = "${var.identifier}-caasp-ssh"
 
   network {
     name = "${var.internal_net}"
@@ -102,7 +105,7 @@ resource "openstack_compute_floatingip_associate_v2" "admin_ext_ip" {
 
 resource "openstack_compute_instance_v2" "master" {
   count      = "${var.masters}"
-  name       = "caasp-master${count.index}"
+  name       = "${var.identfier}-caasp-master-${count.index}"
   image_name = "${var.image_name}"
 
   connection {
@@ -110,7 +113,7 @@ resource "openstack_compute_instance_v2" "master" {
   }
 
   flavor_name = "${var.master_size}"
-  key_pair    = "caasp-ssh-${var.identifier}"
+  key_pair    = "${var.identifier}-caasp-ssh"
 
   network {
     name = "${var.internal_net}"
@@ -137,7 +140,7 @@ resource "openstack_compute_floatingip_associate_v2" "master_ext_ip" {
 
 resource "openstack_compute_instance_v2" "worker" {
   count      = "${var.workers}"
-  name       = "caasp-worker${count.index}"
+  name       = "${var.identfier}-caasp-worker-${count.index}"
   image_name = "${var.image_name}"
 
   connection {
@@ -145,7 +148,7 @@ resource "openstack_compute_instance_v2" "worker" {
   }
 
   flavor_name = "${var.worker_size}"
-  key_pair    = "caasp-ssh-${var.identifier}"
+  key_pair    = "${var.identfier}-caasp-ssh"
 
   network {
     name = "${var.internal_net}"
@@ -161,7 +164,7 @@ resource "openstack_compute_instance_v2" "worker" {
 
 resource "openstack_blockstorage_volume_v2" "worker-volumes" {
     depends_on = ["openstack_compute_instance_v2.worker"]
-    name       = "${var.cluster_name}-worker-volume-${ count.index / var.additional_volume_count }-${ count.index % var.additional_volume_count }"
+    name       = "${var.identfier}-worker-volume-${ count.index / var.additional_volume_count }-${ count.index % var.additional_volume_count }"
     count      = "${ var.workers * var.additional_volume_count }"
     size       = "${var.additional_volume_size}"
 }
@@ -184,7 +187,7 @@ resource "openstack_compute_floatingip_associate_v2" "worker_ext_ip" {
 }
 
 resource "openstack_blockstorage_volume_v2" "worker-volumes" {
-  name       = "${var.cluster_name}-worker-volume-${ count.index / var.additional_volume_count }-${ count.index % var.additional_volume_count }"
+  name       = "${var.identfier}-worker-volume-${ count.index / var.additional_volume_count }-${ count.index % var.additional_volume_count }"
   count      = "${ var.workers * var.additional_volume_count }"
   size       = "${var.additional_volume_size}"
 }

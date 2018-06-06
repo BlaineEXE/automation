@@ -33,7 +33,7 @@ USAGE:
   * workers - Number of CaaSP Worker nodes
   * dnsdomain - create a subdomain in an existing designate domain if dnsentry variable is set to 0
   * dnsentry - if set to 1 creates the dnsdomain subdomain if set to 0 it does not create dns entries
-  * identifier - appends to ssh key names and security group definitions so that there are no colissions when using one namespace
+  * identifier - name to prefix resources to prevent user collisions in shared environments
 
 
   3. Run caasp-openstack with following action:
