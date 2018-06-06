@@ -54,7 +54,7 @@ data "template_file" "cloud-init" {
 
 resource "openstack_compute_keypair_v2" "keypair" {
   name       = "caasp-ssh"
-  public_key = "${file("ssh/id_caasp.pub")}"
+  public_key = "${file("../misc-files/id_shared.pub")}"
 }
 
 resource "openstack_compute_instance_v2" "admin" {
@@ -62,7 +62,7 @@ resource "openstack_compute_instance_v2" "admin" {
   image_name = "${var.image_name}"
 
   connection {
-    private_key = "${file("ssh/id_caasp.pub")}"
+    private_key = "${file("../misc-files/id_shared")}"
   }
 
   flavor_name = "${var.admin_size}"
@@ -95,7 +95,7 @@ resource "openstack_compute_instance_v2" "master" {
   image_name = "${var.image_name}"
 
   connection {
-    private_key = "${file("ssh/id_caasp.pub")}"
+    private_key = "${file("../misc-files/id_shared")}"
   }
 
   flavor_name = "${var.master_size}"
@@ -130,7 +130,7 @@ resource "openstack_compute_instance_v2" "worker" {
   image_name = "${var.image_name}"
 
   connection {
-    private_key = "${file("ssh/id_caasp.pub")}"
+    private_key = "${file("../misc-files/id_shared")}"
   }
 
   flavor_name = "${var.worker_size}"
