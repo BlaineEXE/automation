@@ -1,6 +1,5 @@
 resource "openstack_compute_secgroup_v2" "secgroup_base" {
   name        = "caasp-base"
-  region      = "${var.region_name}"
   description = "Basic security group for CaaSP"
 
   rule {
@@ -34,7 +33,6 @@ resource "openstack_compute_secgroup_v2" "secgroup_base" {
 
 resource "openstack_compute_secgroup_v2" "secgroup_admin" {
   name        = "caasp-admin"
-  region      = "${var.region_name}"
   description = "CaaSP security group for admin"
 
   rule {
@@ -68,7 +66,6 @@ resource "openstack_compute_secgroup_v2" "secgroup_admin" {
 
 resource "openstack_compute_secgroup_v2" "secgroup_master" {
   name        = "caasp-master"
-  region      = "${var.region_name}"
   description = "CaaSP security group for masters"
 
   rule {
@@ -109,7 +106,6 @@ resource "openstack_compute_secgroup_v2" "secgroup_master" {
 
 resource "openstack_compute_secgroup_v2" "secgroup_worker" {
   name        = "caasp-worker"
-  region      = "${var.region_name}"
   description = "CaaSP security group for workers"
 
   rule {
