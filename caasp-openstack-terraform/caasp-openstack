@@ -22,6 +22,10 @@ USAGE:
   # export OS_USERNAME - OpenStack User Name
   # export OS_PASSWORD - OpenStack User Password
 
+    optional:
+
+  # export CLUSTER_NAME=<my-dev-stack-name>
+
   2. Edit openstack.tfvars file and provide following options
 
   * image_name - CaaSP OpenStack Image Name
@@ -72,4 +76,4 @@ if [ -v $OS_PASSWORD ]; then
   export OS_PASSWORD=$OS_PASSWORD_INPUT
 fi
 
-terraform $COMMAND -var-file=openstack.tfvars
+terraform $COMMAND -var-file=openstack.tfvars -var cluster_name=${CLUSTER_NAME:=$USER}

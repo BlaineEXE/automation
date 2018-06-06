@@ -1,3 +1,7 @@
+variable "cluster_name" {
+  description = "Name to prefix resources to prevent user collisions in shared OpenStack environments."
+  default     = "test"
+}
 variable "image_name" {}
 variable "internal_net" {}
 variable "external_net" {}
@@ -63,12 +67,12 @@ data "template_file" "cloud-init" {
 }
 
 resource "openstack_compute_keypair_v2" "keypair" {
-  name       = "caasp-ssh"
+  name       = "${var.cluster_name}-caasp-ssh"
   public_key = "${file("../misc-files/id_shared.pub")}"
 }
 
 resource "openstack_compute_instance_v2" "admin" {
-  name       = "caasp-admin"
+  name       = "${var.cluster_name}-caasp-admin"
   image_name = "${var.image_name}"
 
   connection {
@@ -76,7 +80,7 @@ resource "openstack_compute_instance_v2" "admin" {
   }
 
   flavor_name = "${var.admin_size}"
-  key_pair    = "caasp-ssh"
+  key_pair    = "${var.cluster_name}-caasp-ssh"
 
   network {
     name = "${var.internal_net}"
@@ -101,7 +105,7 @@ resource "openstack_compute_floatingip_associate_v2" "admin_ext_ip" {
 
 resource "openstack_compute_instance_v2" "master" {
   count      = "${var.masters}"
-  name       = "caasp-master${count.index}"
+  name       = "${var.cluster_name}-caasp-master-${count.index}"
   image_name = "${var.image_name}"
 
   connection {
@@ -109,7 +113,7 @@ resource "openstack_compute_instance_v2" "master" {
   }
 
   flavor_name = "${var.master_size}"
-  key_pair    = "caasp-ssh"
+  key_pair    = "${var.cluster_name}-caasp-ssh"
 
   network {
     name = "${var.internal_net}"
@@ -136,7 +140,7 @@ resource "openstack_compute_floatingip_associate_v2" "master_ext_ip" {
 
 resource "openstack_compute_instance_v2" "worker" {
   count      = "${var.workers}"
-  name       = "caasp-worker${count.index}"
+  name       = "${var.cluster_name}-caasp-worker-${count.index}"
   image_name = "${var.image_name}"
 
   connection {
@@ -144,7 +148,7 @@ resource "openstack_compute_instance_v2" "worker" {
   }
 
   flavor_name = "${var.worker_size}"
-  key_pair    = "caasp-ssh"
+  key_pair    = "${var.cluster_name}-caasp-ssh"
 
   network {
     name = "${var.internal_net}"
