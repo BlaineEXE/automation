@@ -8,3 +8,5 @@ worker_size = "m1.large"
 workers = 3
 dnsdomain = "testing.qa.caasp.suse.net"
 dnsentry = "0"
+additional_volume_count = 0
+additional_volume_size = 10
