@@ -36,6 +36,9 @@ USAGE:
   * identifier - name to prefix resources to prevent user collisions in shared environments
 
 
+  You may optionally specify a different .tfvars file as follows:
+  # export TFVARS_FILE="/home/user/my-custom-settings.tfvars"
+
   3. Run caasp-openstack with following action:
 
   # caasp-openstack apply - deploy CaaSP application
@@ -81,4 +84,5 @@ fi
 # Get it procedurally here to prevent user error from having to input both name and ID.
 external_net_id=$(eval "$(openstack network show --format shell floating | grep '^id=')" && echo "${id}")
 
-terraform $COMMAND -var-file=openstack.tfvars -var external_net_id="${external_net_id}" $@
+terraform $COMMAND -var-file="${TFVARS_FILE:='openstack.tfvars'}" \
+                   -var external_net_id="${external_net_id}" $@
