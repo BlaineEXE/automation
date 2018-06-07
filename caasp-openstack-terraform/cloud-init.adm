@@ -14,9 +14,9 @@ suse_caasp:
 # setup and enable ntp
 ntp:
   servers:
-    - ntp1.suse.de
-    - ntp2.suse.de
-    - ntp3.suse.de
+    - 0.opensuse.pool.ntp.org
+    - 1.opensuse.pool.ntp.org
+    - 2.opensuse.pool.ntp.org
 
 runcmd:
   - /usr/bin/systemctl enable --now ntpd
