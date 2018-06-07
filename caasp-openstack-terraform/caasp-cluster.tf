@@ -83,6 +83,13 @@ resource "openstack_dns_recordset_v2" "master" {
   depends_on  = ["openstack_compute_instance_v2.master", "openstack_compute_floatingip_associate_v2.master_ext_ip"]
 }
 
+data "template_file" "cloud-init-admin" {
+  template = "${file("cloud-init.adm")}"
+  vars {
+    admin_name = "${var.cluster_name}-caasp-admin"
+  }
+}
+
 data "template_file" "cloud-init" {
   template = "${file("cloud-init.cls")}"
 
@@ -121,7 +128,7 @@ resource "openstack_compute_instance_v2" "admin" {
     "${openstack_compute_secgroup_v2.secgroup_admin.name}",
   ]
 
-  user_data = "${file("cloud-init.adm")}"
+  user_data = "${data.template_file.cloud-init-admin.rendered}"
 }
 
 # Admin net connecctions

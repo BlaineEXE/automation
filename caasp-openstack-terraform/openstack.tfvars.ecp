@@ -2,6 +2,7 @@ image_name = "CaaSP-3.0.0-Build14.3"
 internal_net = "caasp-net"
 create_internal_net = true
 external_net = "floating"
+external_net_domain = ""
 get_floating_ips = true
 admin_size = "m1.large"
 master_size = "m1.large"
