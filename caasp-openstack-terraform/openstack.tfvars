@@ -1,6 +1,8 @@
 image_name = "CaaSP-release-3.0-Build13.31"
 internal_net = "caasp-net"
+create_internal_net = false
 external_net = "ext-net"
+get_floating_ips = true
 admin_size = "m1.large"
 master_size = "m1.large"
 masters = 3
