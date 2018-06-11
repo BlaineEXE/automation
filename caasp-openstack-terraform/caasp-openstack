@@ -88,3 +88,9 @@ external_net=$(eval "$(cat "${TFVARS_FILE}" | grep '^external_net =' | tr --dele
 external_net_id=$(eval "$(openstack network show --format shell "${external_net}" | grep '^id=')" && echo "${id}")
 
 terraform $COMMAND -var-file="${TFVARS_FILE}" -var external_net_id="${external_net_id}" $@
+
+if [ "$COMMAND" = 'apply' ]; then
+  tools/generate-environment.py > environment.json
+elif [ "$COMMAND" = 'destroy' ]; then
+  rm environment.json
+fi
