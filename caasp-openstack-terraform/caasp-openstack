@@ -90,3 +90,9 @@ external_net_id=$(eval "$(openstack network show --format shell "${external_net}
 terraform $COMMAND -var-file="${TFVARS_FILE}" \
                    -var cluster_name=${CLUSTER_NAME:=$USER} \
                    -var external_net_id="${external_net_id}" $@
+
+if [ "$COMMAND" = 'apply' ]; then
+  tools/generate-environment.py > environment.json
+elif [ "$COMMAND" = 'destroy' ]; then
+  rm environment.json
+fi
