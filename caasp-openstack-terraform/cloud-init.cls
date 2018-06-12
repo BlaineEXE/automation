@@ -5,6 +5,7 @@ locale: en_US.UTF-8
 
 # set timezone
 timezone: Europe/Warsaw
+hostname: ${hostname}
 
 # set as admin node
 suse_caasp:
