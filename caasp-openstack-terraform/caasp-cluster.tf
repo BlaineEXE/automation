@@ -86,15 +86,25 @@ resource "openstack_dns_recordset_v2" "master" {
 data "template_file" "cloud-init-admin" {
   template = "${file("cloud-init.adm")}"
   vars {
-    admin_name = "${var.cluster_name}-caasp-admin"
+    admin_name = "${var.identfier}-caasp-admin"
   }
 }
 
-data "template_file" "cloud-init" {
+data "template_file" "cloud-init-masters" {
+  count = "${var.masters}"
   template = "${file("cloud-init.cls")}"
-
   vars {
     admin_address = "${openstack_compute_instance_v2.admin.access_ip_v4}"
+    hostname = "${var.identfier}-caasp-master-${count.index}"
+  }
+}
+
+data "template_file" "cloud-init-workers" {
+  count = "${var.workers}"
+  template = "${file("cloud-init.cls")}"
+  vars {
+    admin_address = "${openstack_compute_instance_v2.admin.access_ip_v4}"
+    hostname = "${var.identfier}-caasp-worker-${count.index}"
   }
 }
 
@@ -171,7 +181,7 @@ resource "openstack_compute_instance_v2" "master" {
     "${openstack_compute_secgroup_v2.secgroup_master.name}",
   ]
 
-  user_data = "${data.template_file.cloud-init.rendered}"
+  user_data = "${element(data.template_file.cloud-init-masters.*.rendered, count.index)}"
 }
 
 # Master net connections
@@ -214,7 +224,8 @@ resource "openstack_compute_instance_v2" "worker" {
     "${openstack_compute_secgroup_v2.secgroup_worker.name}",
   ]
 
-  user_data = "${data.template_file.cloud-init.rendered}"
+  user_data = "${element(data.template_file.cloud-init-workers.*.rendered, count.index)}"
+
 }
 
 # Worker net connections
