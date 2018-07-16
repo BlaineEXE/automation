@@ -1,5 +1,5 @@
 resource "openstack_compute_secgroup_v2" "secgroup_base" {
-  name        = "${var.identfier}caasp-base"
+  name        = "${var.identifier}caasp-base"
   description = "Basic security group for CaaSP"
 
   rule {
@@ -32,7 +32,7 @@ resource "openstack_compute_secgroup_v2" "secgroup_base" {
 }
 
 resource "openstack_compute_secgroup_v2" "secgroup_admin" {
-  name        = "${var.identfier}caasp-admin"
+  name        = "${var.identifier}caasp-admin"
   description = "CaaSP security group for admin"
 
   rule {
@@ -79,7 +79,7 @@ resource "openstack_compute_secgroup_v2" "secgroup_admin" {
 }
 
 resource "openstack_compute_secgroup_v2" "secgroup_master" {
-  name        = "${var.identfier}caasp-master"
+  name        = "${var.identifier}caasp-master"
   description = "CaaSP security group for masters"
 
   rule {
@@ -119,7 +119,7 @@ resource "openstack_compute_secgroup_v2" "secgroup_master" {
 }
 
 resource "openstack_compute_secgroup_v2" "secgroup_worker" {
-  name        = "${var.identfier}caasp-worker"
+  name        = "${var.identifier}caasp-worker"
   description = "CaaSP security group for workers"
 
   rule {
@@ -128,6 +128,7 @@ resource "openstack_compute_secgroup_v2" "secgroup_worker" {
     ip_protocol = "tcp"
     cidr        = "0.0.0.0/0"
   }
+
 
   rule {
     from_port   = 443
